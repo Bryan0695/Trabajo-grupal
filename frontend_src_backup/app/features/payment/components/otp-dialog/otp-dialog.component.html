@@ -1,0 +1,54 @@
+<div class="otp-wrapper">
+  <div class="otp-card">
+
+    <div class="otp-icon">📱</div>
+    <h2>Código de verificación</h2>
+    <p class="otp-description">
+      Tu banco ha enviado un código OTP a tu número de teléfono o correo registrado.
+      Ingrésalo a continuación para completar el pago.
+    </p>
+
+    <!-- Error del servidor -->
+    <div class="alert alert-error" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div class="otp-field">
+      <input
+        type="text"
+        inputmode="numeric"
+        placeholder="Código OTP"
+        maxlength="8"
+        [formControl]="otpControl"
+        [class.is-invalid]="hasFormatError"
+        (keyup.enter)="onSubmit()"
+        autofocus
+      />
+      <small class="error" *ngIf="otpControl.hasError('required') && otpControl.touched">
+        Ingrese el código OTP
+      </small>
+      <small class="error" *ngIf="hasFormatError">
+        Código inválido (4–8 dígitos)
+      </small>
+    </div>
+
+    <button class="btn btn-primary btn-block" (click)="onSubmit()" [disabled]="loading">
+      <span *ngIf="!loading">Verificar código</span>
+      <span *ngIf="loading">Verificando...</span>
+    </button>
+
+    <div class="resend-section">
+      <span *ngIf="!canResend" class="countdown">
+        ¿No recibiste el código? Reenviar en <strong>{{ countdown }}s</strong>
+      </span>
+      <button *ngIf="canResend" class="btn-link" (click)="onResend()">
+        Reenviar código
+      </button>
+    </div>
+
+    <button class="btn-cancel" (click)="onCancel()" [disabled]="loading">
+      Cancelar y volver al formulario
+    </button>
+
+  </div>
+</div>

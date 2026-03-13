@@ -1,0 +1,69 @@
+<div class="result-wrapper">
+  <div class="result-card" [class.success]="success" [class.error]="!success">
+
+    <!-- ── Éxito ───────────────────────────────────────────────── -->
+    <ng-container *ngIf="success && detail">
+      <div class="result-icon success-icon">✅</div>
+      <h2>¡Pago exitoso!</h2>
+      <p class="result-subtitle">Tu transacción fue procesada correctamente.</p>
+
+      <div class="detail-table">
+        <div class="detail-row">
+          <span class="label">Comprobante</span>
+          <span class="value mono">{{ detail.token }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Monto pagado</span>
+          <span class="value">${{ detail.amount | number:'1.2-2' }} USD</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Tarjeta</span>
+          <span class="value">{{ detail.cardIssuer }} {{ detail.cardInfo }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Titular</span>
+          <span class="value">{{ detail.clientName }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Fecha</span>
+          <span class="value">{{ detail.fecha }}</span>
+        </div>
+        <div class="detail-row" *ngIf="detail.deferred && detail.deferred > 0">
+          <span class="label">Cuotas</span>
+          <span class="value">{{ detail.deferred }}</span>
+        </div>
+        <div class="detail-row" *ngIf="detail.idSuscription">
+          <span class="label">Suscripción ID</span>
+          <span class="value mono">{{ detail.idSuscription }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Banco</span>
+          <span class="value">{{ detail.acquirer }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Estado</span>
+          <span class="value badge badge-success">{{ detail.state }}</span>
+        </div>
+      </div>
+
+      <button class="btn btn-outline btn-block" (click)="onRetry()">
+        Realizar otro pago
+      </button>
+    </ng-container>
+
+    <!-- ── Error ───────────────────────────────────────────────── -->
+    <ng-container *ngIf="!success">
+      <div class="result-icon error-icon">❌</div>
+      <h2>Pago no procesado</h2>
+      <p class="result-subtitle">{{ errorMessage || 'La transacción fue rechazada.' }}</p>
+      <p class="error-hint">
+        Verifique los datos de su tarjeta, que tenga cupo disponible, o intente con otro medio de pago.
+      </p>
+
+      <button class="btn btn-primary btn-block" (click)="onRetry()">
+        Intentar nuevamente
+      </button>
+    </ng-container>
+
+  </div>
+</div>
