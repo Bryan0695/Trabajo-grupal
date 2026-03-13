@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    @apply bg-gray-100 text-gray-900 min-h-screen;
+  }
+}
+
+/* Spinner de carga — no se puede expresar bien con solo utilities */
+@layer components {
+  .plux-spinner {
+    @apply w-11 h-11 rounded-full border-4 border-gray-200 border-t-blue-600;
+    animation: spin 0.75s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+}

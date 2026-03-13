@@ -1,0 +1,68 @@
+<div class="flex items-center justify-center min-h-[60vh] px-4">
+  <div class="bg-white border rounded-xl shadow-md p-8 w-full max-w-md text-center"
+       [class.border-t-green-500]="success" [class.border-t-4]="true"
+       [class.border-red-200]="!success" [class.border-green-200]="success">
+
+    @if (success && detail) {
+      <div class="text-5xl mb-3">✅</div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-1">¡Pago exitoso!</h2>
+      <p class="text-sm text-gray-500 mb-6">Tu transacción fue procesada correctamente.</p>
+
+      <div class="text-left border border-gray-100 rounded-lg overflow-hidden mb-6">
+        <div class="flex justify-between px-4 py-3 border-b border-gray-50 text-sm">
+          <span class="text-gray-500 font-medium">Comprobante</span>
+          <span class="font-semibold font-mono text-gray-800">{{ detail.token }}</span>
+        </div>
+        <div class="flex justify-between px-4 py-3 border-b border-gray-50 text-sm">
+          <span class="text-gray-500 font-medium">Monto</span>
+          <span class="font-semibold text-gray-800">${{ detail.amount | number:'1.2-2' }} USD</span>
+        </div>
+        <div class="flex justify-between px-4 py-3 border-b border-gray-50 text-sm">
+          <span class="text-gray-500 font-medium">Tarjeta</span>
+          <span class="font-semibold text-gray-800">{{ detail.cardIssuer }} {{ detail.cardInfo }}</span>
+        </div>
+        <div class="flex justify-between px-4 py-3 border-b border-gray-50 text-sm">
+          <span class="text-gray-500 font-medium">Titular</span>
+          <span class="font-semibold text-gray-800">{{ detail.clientName }}</span>
+        </div>
+        <div class="flex justify-between px-4 py-3 border-b border-gray-50 text-sm">
+          <span class="text-gray-500 font-medium">Fecha</span>
+          <span class="font-semibold text-gray-800">{{ detail.fecha }}</span>
+        </div>
+        <div class="flex justify-between px-4 py-3 border-b border-gray-50 text-sm">
+          <span class="text-gray-500 font-medium">Banco</span>
+          <span class="font-semibold text-gray-800">{{ detail.acquirer }}</span>
+        </div>
+        <div class="flex justify-between px-4 py-3 text-sm">
+          <span class="text-gray-500 font-medium">Estado</span>
+          <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">{{ detail.state }}</span>
+        </div>
+        @if (detail.idSuscription) {
+          <div class="flex justify-between px-4 py-3 border-t border-gray-50 text-sm">
+            <span class="text-gray-500 font-medium">Suscripción</span>
+            <span class="font-mono text-xs text-gray-700">{{ detail.idSuscription }}</span>
+          </div>
+        }
+      </div>
+
+      <button (click)="onRetry()"
+        class="w-full py-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-lg transition-colors">
+        Realizar otro pago
+      </button>
+    }
+
+    @if (!success) {
+      <div class="text-5xl mb-3">❌</div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-1">Pago no procesado</h2>
+      <p class="text-sm text-gray-500 mb-3">{{ errorMessage || 'La transacción fue rechazada.' }}</p>
+      <p class="text-xs text-gray-400 mb-6">
+        Verifique los datos de su tarjeta, que tenga cupo disponible, o intente con otro medio de pago.
+      </p>
+      <button (click)="onRetry()"
+        class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+        Intentar nuevamente
+      </button>
+    }
+
+  </div>
+</div>

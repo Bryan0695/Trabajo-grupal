@@ -1,0 +1,195 @@
+<div class="relative max-w-2xl mx-auto my-8 px-4">
+
+  @if (state.loading) {
+    <div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 rounded-xl">
+      <div class="plux-spinner"></div>
+      <p class="mt-4 text-gray-600 font-medium">Procesando pago...</p>
+    </div>
+  }
+
+  @if (state.step === 'form') {
+    <div class="bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden">
+
+      <div class="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Pago seguro</h2>
+        <div class="flex gap-2 items-center">
+          <span class="text-xs text-gray-400 uppercase tracking-wide">Aceptamos</span>
+          <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold rounded">VISA</span>
+          <span class="px-2 py-0.5 bg-orange-50 text-orange-700 text-xs font-bold rounded">MC</span>
+          <span class="px-2 py-0.5 bg-blue-50 text-blue-800 text-xs font-bold rounded">AMEX</span>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="p-6 space-y-6">
+
+        <fieldset>
+          <legend class="text-xs font-semibold uppercase tracking-widest text-gray-400 pb-2 mb-4 border-b border-gray-100 w-full">Datos de tarjeta</legend>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Número de tarjeta</label>
+            <input type="text" inputmode="numeric" placeholder="0000 0000 0000 0000" maxlength="23"
+              (input)="formatCardNumber($event)" formControlName="cardNumber"
+              class="w-full px-3 py-2.5 border rounded-lg text-base outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              [class.border-red-400]="hasError('cardNumber','required') || hasError('cardNumber','pattern')"
+              [class.border-gray-300]="!hasError('cardNumber','required') && !hasError('cardNumber','pattern')" />
+            @if (hasError('cardNumber', 'required')) { <p class="mt-1 text-xs text-red-500">Campo requerido</p> }
+            @if (hasError('cardNumber', 'pattern'))  { <p class="mt-1 text-xs text-red-500">Número inválido</p> }
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
+              <select formControlName="expirationMonth"
+                class="w-full px-3 py-2.5 border rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white"
+                [class.border-red-400]="hasError('expirationMonth','required')"
+                [class.border-gray-300]="!hasError('expirationMonth','required')">
+                <option value="">Mes</option>
+                @for (m of months; track m.value) { <option [value]="m.value">{{ m.label }}</option> }
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Año</label>
+              <select formControlName="expirationYear"
+                class="w-full px-3 py-2.5 border rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white"
+                [class.border-red-400]="hasError('expirationYear','required')"
+                [class.border-gray-300]="!hasError('expirationYear','required')">
+                <option value="">Año</option>
+                @for (y of years; track y.value) { <option [value]="y.value">{{ y.label }}</option> }
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+              <input type="password" inputmode="numeric" placeholder="•••" maxlength="4" formControlName="cvv"
+                class="w-full px-3 py-2.5 border rounded-lg text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                [class.border-red-400]="hasError('cvv','pattern')"
+                [class.border-gray-300]="!hasError('cvv','pattern')" />
+              @if (hasError('cvv', 'pattern')) { <p class="mt-1 text-xs text-red-500">3 o 4 dígitos</p> }
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="text-xs font-semibold uppercase tracking-widest text-gray-400 pb-2 mb-4 border-b border-gray-100 w-full">Datos del comprador</legend>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nombres</label>
+              <input type="text" formControlName="firstName"
+                class="w-full px-3 py-2.5 border rounded-lg text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                [class.border-red-400]="hasError('firstName','required')"
+                [class.border-gray-300]="!hasError('firstName','required')" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Apellidos</label>
+              <input type="text" formControlName="lastName"
+                class="w-full px-3 py-2.5 border rounded-lg text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                [class.border-red-400]="hasError('lastName','required')"
+                [class.border-gray-300]="!hasError('lastName','required')" />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Cédula / RUC</label>
+            <input type="text" inputmode="numeric" formControlName="documentNumber"
+              class="w-full px-3 py-2.5 border rounded-lg text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              [class.border-red-400]="hasError('documentNumber','pattern')"
+              [class.border-gray-300]="!hasError('documentNumber','pattern')" />
+            @if (hasError('documentNumber', 'pattern')) { <p class="mt-1 text-xs text-red-500">Solo dígitos (6-13)</p> }
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+              <input type="tel" placeholder="+593987654321" formControlName="phone"
+                class="w-full px-3 py-2.5 border rounded-lg text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                [class.border-red-400]="hasError('phone','pattern')"
+                [class.border-gray-300]="!hasError('phone','pattern')" />
+              @if (hasError('phone', 'pattern')) { <p class="mt-1 text-xs text-red-500">Ej: +593987654321</p> }
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input type="email" formControlName="email"
+                class="w-full px-3 py-2.5 border rounded-lg text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                [class.border-red-400]="hasError('email','email')"
+                [class.border-gray-300]="!hasError('email','email')" />
+              @if (hasError('email', 'email')) { <p class="mt-1 text-xs text-red-500">Email inválido</p> }
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="text-xs font-semibold uppercase tracking-widest text-gray-400 pb-2 mb-4 border-b border-gray-100 w-full">Dirección de envío</legend>
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">País</label>
+              <input type="text" formControlName="country"
+                class="w-full px-3 py-2.5 border rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                [class.border-red-400]="hasError('country','required')"
+                [class.border-gray-300]="!hasError('country','required')" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+              <input type="text" formControlName="city"
+                class="w-full px-3 py-2.5 border rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                [class.border-red-400]="hasError('city','required')"
+                [class.border-gray-300]="!hasError('city','required')" />
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Calle</label>
+              <input type="text" formControlName="street"
+                class="w-full px-3 py-2.5 border rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                [class.border-red-400]="hasError('street','required')"
+                [class.border-gray-300]="!hasError('street','required')" />
+            </div>
+            <div class="w-24">
+              <label class="block text-sm font-medium text-gray-700 mb-1">N°</label>
+              <input type="text" formControlName="addressNumber"
+                class="w-full px-3 py-2.5 border rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                [class.border-red-400]="hasError('addressNumber','required')"
+                [class.border-gray-300]="!hasError('addressNumber','required')" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="text-xs font-semibold uppercase tracking-widest text-gray-400 pb-2 mb-4 border-b border-gray-100 w-full">Detalle del pago</legend>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Monto (USD)</label>
+              <input type="number" min="0.01" step="0.01" formControlName="amount"
+                class="w-full px-3 py-2.5 border rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                [class.border-red-400]="hasError('amount','min')"
+                [class.border-gray-300]="!hasError('amount','min')" />
+              @if (hasError('amount', 'min')) { <p class="mt-1 text-xs text-red-500">Minimo $0.01</p> }
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Cuotas</label>
+              <select formControlName="installments" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white">
+                @for (opt of installmentOptions; track opt.value) { <option [value]="opt.value">{{ opt.label }}</option> }
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        @if (state.errorMessage) {
+          <div class="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{{ state.errorMessage }}</div>
+        }
+
+        <button type="submit" [disabled]="state.loading"
+          class="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors text-base">
+          {{ state.loading ? 'Procesando...' : 'Pagar ahora' }}
+        </button>
+
+        <p class="text-center text-xs text-gray-400">Pago seguro con cifrado AES-256 + RSA.</p>
+      </form>
+    </div>
+  }
+
+  @if (state.step === 'otp') {
+    <app-otp-dialog [errorMessage]="state.errorMessage" [loading]="state.loading"
+      (otpSubmitted)="onOtpSubmit($event)" (cancelled)="onOtpCancel()" />
+  }
+  @if (state.step === 'result-success') {
+    <app-payment-result [success]="true" [detail]="state.successData!" (retry)="resetForm()" />
+  }
+  @if (state.step === 'result-error') {
+    <app-payment-result [success]="false" [errorMessage]="state.errorMessage" (retry)="resetForm()" />
+  }
+</div>
